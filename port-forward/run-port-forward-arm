@@ -1,0 +1,8 @@
+#!/bin/bash
+if [[ -z "$1" || -z "$2" ]]; then
+  echo "syntax: run-port-forward <external port> <node port>"
+  exit 0
+fi
+echo "forwading port $1 -> $2"
+docker rm -f port_forward_$1_$2
+docker run --restart=always -d --net=host --name port_forward_$1_$2 -e REMOTE_HOST=127.0.0.1 -e REMOTE_PORT=$2 -p $1:80 lowet84/port-forward-arm

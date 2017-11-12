@@ -1,0 +1,57 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: traefik
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      containers:
+      - name: traefik
+        image: marchman/arm-traefik:v1.4.0-rc4
+        ports:
+        - containerPort: 80
+        - containerPort: 8080
+        args:
+        - --web
+        - --kubernetes
+        - --logLevel=DEBUG
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    name: "ui"
+    nodePort: 30088
+  - port: 80
+    name: "web"
+    nodePort: 30080
+  selector: 
+    app: traefik
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-web-ui
+  namespace: default
+spec:
+  rules:
+  - host: traefik.cluster
+    http:
+      paths:
+      - backend:
+          serviceName: traefik
+          servicePort: 8080
