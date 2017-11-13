@@ -80,7 +80,7 @@ subjects:
 ---
 # ------------------- Dashboard Deployment ------------------- #
 
-kind: Deployment
+kind: DaemonSet
 apiVersion: extensions/v1beta1
 metadata:
   labels:
@@ -88,11 +88,7 @@ metadata:
   name: kubernetes-dashboard-head
   namespace: kube-system
 spec:
-  replicas: 1
   revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      k8s-app: kubernetes-dashboard-head
   template:
     metadata:
       labels:
@@ -104,6 +100,11 @@ spec:
         volumeMounts:
         - name: kubernetes-dashboard-certs
           mountPath: /certs
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
       containers:
       - name: kubernetes-dashboard-head
         image: kubernetesdashboarddev/kubernetes-dashboard-arm:head

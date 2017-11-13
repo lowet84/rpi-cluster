@@ -35,4 +35,8 @@ apt-get update
 
 apt-get install -y kubeadm
 
-
+echo "runcmd:" >> /boot/device-init.yaml
+echo "  - sudo iptables -A FORWARD -i cni0 -j ACCEPT" >> /boot/device-init.yaml
+echo "  - sudo iptables -A FORWARD -o cni0 -j ACCEPT" >> /boot/device-init.yaml
+echo "  - sudo iptables -A FORWARD -i flannel.1 -j ACCEPT" >> /boot/device-init.yaml
+echo "  - sudo iptables -A FORWARD -o flannel.1 -j ACCEPT" >> /boot/device-init.yaml
