@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: elevate
+  namespace: default
+spec:
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: elevate
+    spec:
+      containers:
+      - name: elevate
+        image: lowet84/elevate-test
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 1337
+        volumeMounts:
+        - mountPath: "/app/API"
+          name: volume
+      volumes:
+      - name: volume
+        hostPath:
+          path: /elevate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elevate
+  namespace: default
+spec:
+  ports:
+  - port: 1337
+    name: "web"
+  selector:
+    app: elevate
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: elevate
+  namespace: default
+spec:
+  rules:
+  - host: elevate.cluster
+    http:
+      paths:
+      - backend:
+          serviceName: elevate
+          servicePort: 1337
