@@ -17,67 +17,6 @@
 #
 # Example usage: kubectl create -f <this_file>
 
-# ------------------- Dashboard Secret ------------------- #
-
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard-head
-  name: kubernetes-dashboard-certs
-  namespace: kube-system
-type: Opaque
-
----
-# ------------------- Dashboard Service Account ------------------- #
-
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    k8s-app: kubernetes-dashboard-head
-  name: kubernetes-dashboard-head
-  namespace: kube-system
-
----
-# ------------------- Dashboard Role & Role Binding ------------------- #
-
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: kubernetes-dashboard-minimal
-  namespace: kube-system
-rules:
-  # Allow Dashboard to create and watch for changes of 'kubernetes-dashboard-key-holder' secret.
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["create", "watch"]
-- apiGroups: [""]
-  resources: ["secrets"]
-  # Allow Dashboard to get, update and delete 'kubernetes-dashboard-key-holder' secret.
-  resourceNames: ["kubernetes-dashboard-key-holder", "kubernetes-dashboard-certs"]
-  verbs: ["get", "update", "delete"]
-  # Allow Dashboard to get metrics from heapster.
-#- apiGroups: [""]
-#  resources: ["services"]
-#  resourceNames: ["heapster"]
-#  verbs: ["proxy"]
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
-metadata:
-  name: kubernetes-dashboard-minimal
-  namespace: kube-system
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: kubernetes-dashboard-minimal
-subjects:
-- kind: ServiceAccount
-  name: kubernetes-dashboard-head
-  namespace: kube-system
-
----
 # ------------------- Dashboard Deployment ------------------- #
 
 kind: DaemonSet
@@ -114,8 +53,8 @@ spec:
         - containerPort: 8443
           protocol: TCP
         args:
-          - --tls-key-file=/certs/dashboard.key
-          - --tls-cert-file=/certs/dashboard.crt
+          - --tls-key-file=dashboard.key
+          - --tls-cert-file=dashboard.crt
           # Uncomment the following line to manually specify Kubernetes API server Host
           # If not specified, Dashboard will attempt to auto discover the API server and connect
           # to it. Uncomment only if the kube-system does not work.

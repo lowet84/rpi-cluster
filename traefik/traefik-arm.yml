@@ -49,7 +49,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: traefik.cluster
+  - host: traefik.elevate
     http:
       paths:
       - backend:
