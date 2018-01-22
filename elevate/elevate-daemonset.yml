@@ -1,16 +1,16 @@
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: elevate
+  name: elevate-ds
   namespace: default
 spec:
   template:
     metadata:
       labels:
-        app: elevate
+        app: elevate-ds
     spec:
       containers:
-      - name: elevate
+      - name: elevate-ds
         image: lowet84/elevate-test
         imagePullPolicy: Always
         ports:
@@ -26,25 +26,25 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: elevate
+  name: elevate-ds
   namespace: default
 spec:
   ports:
   - port: 1337
     name: "web"
   selector:
-    app: elevate
+    app: elevate-ds
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: elevate
+  name: elevate-ds
   namespace: default
 spec:
   rules:
-  - host: elevate.cluster
+  - host: ds.elevate.se
     http:
       paths:
       - backend:
-          serviceName: elevate
+          serviceName: elevate-ds
           servicePort: 1337

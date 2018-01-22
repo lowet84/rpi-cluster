@@ -47,9 +47,11 @@ kind: Ingress
 metadata:
   name: traefik-web-ui
   namespace: default
+  annotations:
+    traefik.backend.loadbalancer.method: "drr"
 spec:
   rules:
-  - host: traefik.elevate
+  - host: traefik.elevate.se
     http:
       paths:
       - backend:
